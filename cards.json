@@ -390,14 +390,34 @@
 "desc": "Mr. C.B. (R)"
 },
 {
+"id": 10079,
+"name": "Tracen Academy",
+"desc": "Daiichi Ruby (R)"
+},
+{
+"id": 10080,
+"name": "Tracen Academy",
+"desc": "K.S.Miracle (R)"
+},
+{
 "id": 10081,
 "name": "Tracen Academy",
 "desc": "Tsurumaru Tsuyoshi (R)"
 },
 {
+"id": 10082,
+"name": "Tracen Academy",
+"desc": "Symboli Kris S (R)"
+},
+{
 "id": 10083,
 "name": "Event Producer",
 "desc": "Light Hello (R)"
+},
+{
+"id": 10084,
+"name": "Tracen Academy",
+"desc": "Tanino Gimlet (R)"
 },
 {
 "id": 20001,
@@ -643,6 +663,16 @@
 "id": 20050,
 "name": "Bobbing with the Waves",
 "desc": "Seiun Sky (SR)"
+},
+{
+"id": 20051,
+"name": "The 3rd Miracle",
+"desc": "K.S.Miracle (SR)"
+},
+{
+"id": 20052,
+"name": "Go, Go! Tsuyoshi!",
+"desc": "Tsurumaru Tsuyoshi (SR)"
 },
 {
 "id": 30001,
@@ -1170,8 +1200,68 @@
 "desc": "Manhattan Cafe (SSR)"
 },
 {
+"id": 30111,
+"name": "Teio-Oo-Oo!!!",
+"desc": "Tokai Teio (SSR)"
+},
+{
+"id": 30112,
+"name": "TT Ignition!",
+"desc": "Twin Turbo (SSR)"
+},
+{
+"id": 30113,
+"name": "Uchronia Architect",
+"desc": "Biwa Hayahide (SSR)"
+},
+{
+"id": 30114,
+"name": "Ah, Such Majesty",
+"desc": "Daiichi Ruby (SSR)"
+},
+{
+"id": 30115,
+"name": "Moonlit Devil ♪",
+"desc": "Mejiro Palmer (SSR)"
+},
+{
+"id": 30116,
+"name": "Sunlit Angel ♪",
+"desc": "Daitaku Helios (SSR)"
+},
+{
+"id": 30117,
+"name": "Onwards, Demon Queen Lackeys!",
+"desc": "Shinko Windy (SSR)"
+},
+{
+"id": 30118,
+"name": "A Win Foreshadowed",
+"desc": "Symboli Kris S (SSR)"
+},
+{
+"id": 30119,
+"name": "Hopeful Petals Dancing in the Night",
+"desc": "Mejiro Ardan (SSR)"
+},
+{
+"id": 30120,
+"name": "Pious Flame, Heavens Scorcher",
+"desc": "Yaeno Muteki (SSR)"
+},
+{
 "id": 30121,
 "name": "U & Me",
 "desc": "Mihono Bourbon (SSR)"
+},
+{
+"id": 30145,
+"name": "Welcome to Umayuru",
+"desc": "Tanino Gimlet (SSR)"
+},
+{
+"id": 30146,
+"name": "Run Forth! Dash On! Ever Forward!",
+"desc": "Oguri Cap (SSR)"
 }
 ]

@@ -277,9 +277,9 @@
  },
  "SNOWBRIGHTSNOWFLIGHT": {
   "n": "Snow Bright, Snow Flight",
-  "g": 0,
+  "g": 340,
   "c": 0,
-  "r": 0
+  "r": 5
  },
  "BLUEROSECLOSER": {
   "n": "Blue Rose Closer",
@@ -541,9 +541,9 @@
  },
  "SUNNYBREEZE": {
   "n": "Sunny Breeze",
-  "g": 0,
+  "g": 340,
   "c": 0,
-  "r": 0
+  "r": 5
  },
  "MISSIONTRIUMPH": {
   "n": "Mission: Triumph",
@@ -565,9 +565,9 @@
  },
  "SILENTLETTER": {
   "n": "Silent Letter",
-  "g": 0,
+  "g": 340,
   "c": 0,
-  "r": 0
+  "r": 5
  },
  "LUCKRUNSMYWAY": {
   "n": "Luck Runs My Way",
@@ -715,9 +715,9 @@
  },
  "THEMOEAAAATHANKSFORMYLIFE": {
   "n": "THE MOE AAAA Thanks for My Life",
-  "g": 0,
+  "g": 340,
   "c": 0,
-  "r": 0
+  "r": 5
  },
  "BREAKITDOWN": {
   "n": "Break It Down!",
@@ -727,9 +727,9 @@
  },
  "LIGHTNINGFLARE": {
   "n": "Lightning Flare",
-  "g": 0,
+  "g": 340,
   "c": 0,
-  "r": 0
+  "r": 5
  },
  "BESTDAYEVER": {
   "n": "Best Day Ever",
@@ -781,15 +781,15 @@
  },
  "FIRELIGHT": {
   "n": "Firelight",
-  "g": 0,
+  "g": 340,
   "c": 0,
-  "r": 0
+  "r": 5
  },
  "TICKETTOYOURDREAMS": {
   "n": "Ticket to Your Dreams!",
-  "g": 0,
+  "g": 340,
   "c": 0,
-  "r": 0
+  "r": 5
  },
  "GUTENAPPETIT": {
   "n": "Guten Appetit ♪",
@@ -835,9 +835,9 @@
  },
  "HEPHAESTUS": {
   "n": "Hephaestus",
-  "g": 0,
+  "g": 340,
   "c": 0,
-  "r": 0
+  "r": 5
  },
  "FLOWERINGDREAMS": {
   "n": "Flowering Dreams",
@@ -865,9 +865,9 @@
  },
  "SPOOKYSCARYHAPPY": {
   "n": "Spooky, Scary, Happy",
-  "g": 0,
+  "g": 340,
   "c": 0,
-  "r": 0
+  "r": 5
  },
  "WHEREVERTHISWONDERLEADS": {
   "n": "Wherever This Wonder Leads",
@@ -2929,15 +2929,21 @@
  },
  "GIVINIT1000": {
   "n": "Givin' It 1000%",
-  "g": 0,
-  "c": 0,
-  "r": 0
+  "g": 508,
+  "c": 180,
+  "r": 2
  },
  "MADDASH": {
   "n": "Mad Dash",
-  "g": 0,
-  "c": 0,
-  "r": 0
+  "g": 217,
+  "c": 180,
+  "r": 1
+ },
+ "LIGHTNINGSURGE": {
+  "n": "Lightning Surge",
+  "g": 508,
+  "c": 180,
+  "r": 2
  },
  "LEAPFORWARD": {
   "n": "Leap Forward",
