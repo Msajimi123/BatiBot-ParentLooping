@@ -1,4 +1,6 @@
-# BatiBot
+# BatiBot + Parent Looping
+
+Original forked from 
 
 BatiBot loops Uma Musume **Independent Training** careers automatically on MuMu
 Player. The game plays each 50-minute career by itself; this bot just
