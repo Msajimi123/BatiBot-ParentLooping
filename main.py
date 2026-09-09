@@ -19,6 +19,8 @@ DEFAULTS = {
     "spend_all_sp": True,
     "smart_skills": True,
     "auto_reroll": False,
+    "parents_loop": False,     # rotate trainee + inherit from 2 most recent legacies
+    "random_break": True,      # random 1-5 min pause between careers
     "recover_tp": False,
     "recover_tp_carats_only": False,
     "it_focus": "",

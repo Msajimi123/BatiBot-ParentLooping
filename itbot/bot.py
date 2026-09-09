@@ -15,6 +15,7 @@ Loop per career:
 """
 import json
 import os
+import random
 import re
 import time
 import threading
@@ -91,6 +92,52 @@ HOME_TAB = (360, 1225)       # Home in the bottom bar - the way back from
                              # anywhere in the main menus
 CAROUSEL_LEFT = (57, 150)    # spark set carousel arrows
 CAROUSEL_RIGHT = (663, 150)
+
+# ---- looping parents (inheritance sparks) -------------------------------
+# Rotate the trainee through a fixed list and always inherit from the two
+# most recently acquired legacies. Trainee selection uses the game's own
+# Filter screen + fixed grid positions (no scrolling / OCR name matching),
+# so the pick is deterministic. All coords are 720x1280.
+PARENT_ROTATION = ["Agnes Digital", "Inari One", "Oguri Cap", "El Condor Pasa"]
+
+# filter group each parent needs (Trainee Select -> Filter screen):
+#   "mile_pace": select Mile (distance) + Pace (style)
+#   "dirt":      select Dirt (surface)
+PARENT_FILTER = {
+    "Agnes Digital": "mile_pace",
+    "Inari One": "dirt",
+    "Oguri Cap": "mile_pace",
+    "El Condor Pasa": "mile_pace",
+}
+
+# exact grid tap position each parent lands in after its filter is applied
+PARENT_POSITION = {
+    "Agnes Digital": (97, 716),
+    "El Condor Pasa": (355, 720),
+    "Oguri Cap": (326, 870),
+    "Inari One": (349, 716),
+}
+
+# Trainee Select: filter/sort controls
+FILTER_OPEN = (483, 994)     # Filter button (opens the sort/filter screen)
+ASCDESC_BTN = (624, 992)     # Asc/Desc sort-order toggle
+FILTER_TAB = (481, 136)      # Filter tab inside the sort/filter screen
+
+# Filter screen controls
+FILTER_RESET = (584, 1067)   # Reset (clear filters)
+FILTER_DIRT = (299, 491)     # Track -> Dirt toggle
+FILTER_MILE = (301, 632)     # Distance -> Mile toggle
+FILTER_PACE = (297, 844)     # Style -> Pace toggle
+FILTER_OK = (518, 1181)      # OK (confirm filter)
+
+# legacy selection: the "Select a Legacy" buttons (open the list) and the
+# card positions in the list (sorted Date Acquired Desc: card 1 = newest,
+# card 2 = 2nd newest).
+LEGACY_RESET = (210, 975)    # Reset button (clears previous legacy slots)
+LEGACY_OPEN_1 = (110, 804)   # "Select a Legacy" button, slot 1
+LEGACY_OPEN_2 = (462, 794)   # "Select a Legacy" button, slot 2
+LEGACY_SLOT_1 = (225, 775)   # legacy card 1 (newest) in the list
+LEGACY_SLOT_2 = (364, 775)   # legacy card 2 (2nd newest) in the list
 
 TIMER_RE = re.compile(r"(\d+)\D(\d{1,2})\D(\d{1,2})")
 
@@ -351,6 +398,16 @@ class ItBot:
             time.sleep(min(15, max(0.5, end - time.time())))
         self.sleep_until = 0
         return not self._stop.is_set()
+
+    def _between_careers_sleep(self):
+        """Random 1-5 minute pause between careers, so consecutive runs don't
+        start in a perfectly predictable rhythm. Skipped when random_break is
+        turned off in settings."""
+        if not self.s.get("random_break", True):
+            return
+        secs = random.randint(60, 300)
+        self.log(f"[BOT] pausing {secs}s between careers (random)")
+        self._sleep(secs)
 
     def _read_stats_row(self, row_y):
         """Read the five stat numbers from the Training Log band alone.
@@ -1445,7 +1502,8 @@ class ItBot:
             if maxc and self.careers_done >= maxc:
                 self.log(f"[BOT] reached max careers ({maxc}) - stopping")
                 self._stop.set()
-            time.sleep(5)
+            else:
+                self._between_careers_sleep()
             return
 
         # ---- 8. borrow card list ------------------------------------------------
@@ -1456,9 +1514,21 @@ class ItBot:
         # ---- 9. setup screens -----------------------------------------------------
         if "SCENARIO SELECT" in txt:
             self._set_state("scenario select")
+            self._shot("setup_scenario_select", img, note=txt[:300])
             self._tap_text(boxes, "Next") or self.adb.tap(360, 1077, "Next (fixed)")
             time.sleep(2.5)
             return
+
+        # looping parents: pick the trainee by filter + fixed grid slot
+        if self.s.get("parents_loop") and ("TRAINEE SELECT" in txt or "SELECT TRAINEE" in txt):
+            self._pick_trainee()
+            return
+
+        # looping parents: pick the two most recent legacies
+        if self.s.get("parents_loop") and "LEGACY" in txt:
+            self._pick_legacy()
+            return
+
         if "SUPPORT FORMATION" in txt or _has(boxes, "Start Career", 85):
             self._set_state("support formation")
             if not self._borrow_done:
@@ -1471,6 +1541,10 @@ class ItBot:
         for setup in ("TRAINEE SELECT", "LEGACY", "SELECT TRAINEE"):
             if setup in txt and _has(boxes, "Next"):
                 self._set_state("setup: " + setup.lower())
+                # debug: capture the trainee/legacy selection screens so the
+                # filter/sort controls and grid positions can be mapped
+                self._shot("setup_" + setup.lower().replace(" ", "_"),
+                           img, note=txt[:300])
                 self._tap_text(boxes, "Next")
                 time.sleep(2.5)
                 return
@@ -1686,6 +1760,108 @@ class ItBot:
             return int((mask > 0).sum())
         except Exception:
             return 0
+
+    # ---- looping parents -------------------------------------------------
+    def _parent_target(self):
+        """The trainee to pick this career (rotation over completed careers)."""
+        return PARENT_ROTATION[self.careers_done % len(PARENT_ROTATION)]
+
+    def _reset_sort_order(self):
+        """Ensure the trainee list is sorted Ascending (the default) so the
+        grid positions are deterministic. Reads the Asc/Desc indicator next to
+        the button and flips it only when it shows Desc."""
+        img = self.adb.screenshot()
+        boxes = ocr_boxes(img) if img is not None else []
+        near = [b[0].upper() for b in boxes
+                if abs(b[1] - ASCDESC_BTN[0]) < 80 and abs(b[2] - ASCDESC_BTN[1]) < 30]
+        order = " ".join(near)
+        if "DESC" in order:
+            self.log(f"[PARENTS] sort is Desc ('{order.strip()}') - flipping to Asc")
+            self.adb.tap(*ASCDESC_BTN, "sort -> Ascending")
+            time.sleep(1.5)
+        elif "ASC" in order:
+            self.log("[PARENTS] sort already Ascending")
+        else:
+            self.log(f"[PARENTS] sort indicator unclear ('{order.strip()}') - leaving as is")
+
+    def _set_parent_filter(self, group):
+        """Open the Filter screen (two-step: Filter button -> Filter tab),
+        reset it, then select the group toggles. Reset first so the toggles
+        are deterministic regardless of the previous career's filter."""
+        # 1. open the sort/filter screen from Trainee Select
+        self.adb.tap(*FILTER_OPEN, "Filter (open)")
+        time.sleep(2.5)
+        # 2. switch to the Filter tab
+        self.adb.tap(*FILTER_TAB, "Filter tab")
+        time.sleep(1.5)
+        # 3. reset to a known (empty) state
+        self.adb.tap(*FILTER_RESET, "Reset filters")
+        time.sleep(1.5)
+        # 4. select the desired toggles
+        if group == "dirt":
+            self.adb.tap(*FILTER_DIRT, "Dirt filter")
+        else:
+            self.adb.tap(*FILTER_MILE, "Mile filter")
+            time.sleep(0.8)
+            self.adb.tap(*FILTER_PACE, "Pace filter")
+        time.sleep(1.0)
+        # 5. confirm
+        self.adb.tap(*FILTER_OK, "OK (filter)")
+        time.sleep(2.5)
+
+    def _pick_trainee(self):
+        """Select the rotation trainee: reset sort -> filter -> tap grid slot."""
+        target = self._parent_target()
+        group = PARENT_FILTER.get(target, "mile_pace")
+        pos = PARENT_POSITION.get(target, (97, 716))
+        self._set_state("pick trainee")
+        self.log(f"[PARENTS] career #{self.careers_done + 1} -> {target} "
+                 f"(filter {group}, pos {pos})")
+        self._reset_sort_order()
+        self._set_parent_filter(group)
+        img = self.adb.screenshot()
+        if img is not None and "TRAINEE SELECT" in _all_text(ocr_boxes(img)):
+            self.adb.tap(*pos, f"trainee = {target}")
+            time.sleep(2.0)
+            img2 = self.adb.screenshot()
+            boxes2 = ocr_boxes(img2) if img2 is not None else []
+            txt2 = _all_text(boxes2)
+            want = _norm_name(target)
+            if want and want in _norm_name(txt2):
+                self.log(f"[PARENTS] confirmed '{target}' selected")
+            else:
+                self._shot("parent_pick_" + want, img2, note=txt2[:200])
+                self.log(f"[PARENTS] WARNING: '{target}' not confirmed on screen "
+                         f"({txt2[:100]})")
+        else:
+            self.log("[PARENTS] WARNING: not on Trainee Select after filtering")
+        self._trainee = target
+        img = self.adb.screenshot()
+        boxes = ocr_boxes(img) if img is not None else []
+        self._tap_text(boxes, "Next") or self.adb.tap(357, 1078, "Next (fixed)")
+        time.sleep(2.5)
+
+    def _pick_legacy(self):
+        """Select the two most recent legacies (list sorted Date Acquired
+        Desc once by the user; card 1 = newest, card 2 = 2nd newest)."""
+        self._set_state("pick legacy")
+        self.log("[PARENTS] selecting top-2 legacies (Date Acquired Desc)")
+        # clear any legacy left over from the previous career, so the slots
+        # show "Select a Legacy" again (the game otherwise keeps the last used)
+        self.adb.tap(*LEGACY_RESET, "Reset legacy")
+        time.sleep(1.5)
+        for i, (slot, open_pos) in enumerate([(LEGACY_SLOT_1, LEGACY_OPEN_1),
+                                              (LEGACY_SLOT_2, LEGACY_OPEN_2)]):
+            self.adb.tap(*open_pos, f"Select a Legacy {i + 1}")
+            time.sleep(2.5)
+            self.adb.tap(*slot, f"legacy {i + 1}")
+            time.sleep(1.5)
+            self.adb.tap(356, 1077, "Confirm (legacy)")
+            time.sleep(2.5)
+        img = self.adb.screenshot()
+        boxes = ocr_boxes(img) if img is not None else []
+        self._tap_text(boxes, "Next") or self.adb.tap(357, 1078, "Next (fixed)")
+        time.sleep(2.5)
 
     def _handle_borrow(self, img, boxes):
         """Find the configured borrow card, then the backup card; refresh

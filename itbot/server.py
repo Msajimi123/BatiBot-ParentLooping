@@ -104,6 +104,8 @@ PAGE = """<!doctype html>
    <option value="normal">Normal Mode (no test)</option>
   </select>
   <div class="toggle"><input type="checkbox" id="load_agenda"><span>Load my FIRST saved agenda before each career (save your schedule in-game once: Agenda &gt; My Agendas &gt; Save Here on the top slot)</span></div>
+  <div class="toggle"><input type="checkbox" id="parents_loop"><span>Looping parents &mdash; rotate trainee (Agnes Digital &rarr; Inari One &rarr; Oguri Cap &rarr; El Condor Pasa) and inherit from the two most recent legacies</span></div>
+  <div class="toggle"><input type="checkbox" id="random_break" checked><span>Random break &mdash; pause 1&ndash;5 minutes between careers</span></div>
   <div class="toggle"><input type="checkbox" id="auto_reroll"><span>Auto-reroll sparks once per career (costs 30 TP; keeps the starrier set)</span></div>
   <div class="toggle"><input type="checkbox" id="recover_tp"><span>Refill TP when it runs out &mdash; uses TP Drinks first, then <b>buys with carats</b> (Max). Off = bot stops when TP is empty.</span></div>
   <div class="toggle" style="margin-left:24px"><input type="checkbox" id="recover_tp_carats_only"><span>Carats only &mdash; never use TP Drinks, always buy TP to max with carats</span></div>
@@ -289,6 +291,8 @@ async function loadSettings(){
  document.getElementById('spend_all_sp').checked=s.spend_all_sp!==false;
  document.getElementById('smart_skills').checked=s.smart_skills!==false;
  document.getElementById('load_agenda').checked=!!(s.agenda_name||'').trim();
+ document.getElementById('parents_loop').checked=!!s.parents_loop;
+ document.getElementById('random_break').checked=s.random_break!==false;
 }
 async function save(){
  const bn=document.getElementById('borrow_name').value.trim();
@@ -307,6 +311,8 @@ async function save(){
   smart_skills:document.getElementById('smart_skills').checked,
   auto_reroll:document.getElementById('auto_reroll').checked,
   recover_tp:document.getElementById('recover_tp').checked,
+   parents_loop:document.getElementById('parents_loop').checked,
+   random_break:document.getElementById('random_break').checked,
   recover_tp_carats_only:document.getElementById('recover_tp_carats_only').checked,
   it_focus:document.getElementById('it_focus').value,
   career_mode:document.getElementById('career_mode').value,

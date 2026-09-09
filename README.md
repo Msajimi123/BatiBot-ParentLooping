@@ -15,6 +15,9 @@ the next one. Runs all night.
   then spends ALL leftover SP top-of-list so nothing is wasted (higher
   career rank)
 - Borrow support card picker
+- Optional looping parents: rotate the trainee and inherit the two most
+  recent legacies (see "Looping parents" below)
+- Optional random 1-5 minute pause between careers (toggle in the UI)
 - Optional one spark reroll per career (keeps the starrier set)
 - Stops by itself when TP runs out. Optional "Refill TP" setting (OFF
   by default) uses your TP Drinks first, then **buys TP with carats** -
@@ -94,7 +97,8 @@ account actions.
 ## What it does per career
 
 1. Home -> CAREER -> clicks through career setup using your **last-used**
-   trainee / legacy / deck (it changes nothing).
+   trainee / legacy / deck (it changes nothing) - or, with Looping parents
+   on, picks the rotation trainee and the two most recent legacies.
 2. Picks the borrow support card you named in the settings (falls back to
    the first card if not found).
 3. Final Confirmation -> **Independent Training** tab -> Start!
@@ -105,9 +109,48 @@ account actions.
 6. Stops by itself when TP runs out (it will NEVER spend carats) or when
    your "max careers" number is reached.
 
+## Looping parents (optional)
+
+By default the bot reuses your last-used trainee and legacy. Turn on
+**Looping parents** in the web UI to instead:
+
+- Rotate the trainee every career:
+  **Agnes Digital -> Inari One -> Oguri Cap -> El Condor Pasa -> repeat**.
+- Always inherit from your **two most recent** legacies (the list is sorted
+  Date Acquired Descending).
+
+How it picks each career:
+
+- **Trainee** - opens the Filter screen, resets it, then applies the filter
+  that puts the target trainee at a fixed grid position and taps that slot:
+  - Agnes Digital / El Condor Pasa / Oguri Cap: **Mile + Pace** filter.
+  - Inari One: **Dirt** filter.
+  - The sort is reset to Ascending first, so the grid order is deterministic.
+- **Legacy** - taps Reset to clear the previous career's slots, then selects
+  the newest legacy into slot 1 and the 2nd newest into slot 2.
+
+### Assumptions
+
+- Coordinates are hardcoded for **720x1280 (DPI 240)**. Other resolutions
+  scale automatically, but the DPI must match or buttons move.
+- The trainee list is sorted by **Name Ascending** and the legacy list by
+  **Date Acquired Descending** - set each once in-game; the bot resets the
+  sort/filter itself every career.
+- The four trainees must exist and match the Mile+Pace / Dirt aptitudes the
+  filters rely on, otherwise the bot taps the wrong slot. It OCR-verifies
+  every pick and logs a warning + screenshot (`logs/shots/parent_pick_*.png`)
+  when a name doesn't match - check the log after the first run.
+
+## Random break
+
+The bot pauses a random **1-5 minutes** after each career before starting the
+next one. Toggle it with **Random break** in the web UI (on by default).
+
 ## Setup (once)
 
-1. Install Python 3.10+ from python.org - tick **"Add python.exe to PATH"**.
+1. Install Python **3.10-3.12** from python.org - tick **"Add python.exe to PATH"**.
+   (3.13+ is NOT supported: the pinned numpy/paddlepaddle wheels only exist
+   up to 3.12.)
 2. Run `install.bat` (takes a few minutes - it downloads the OCR engine).
 3. MuMu Player: set display to **720x1280 (portrait), DPI 240** - this
    is the tested setup. Other resolutions still work (the bot scales
