@@ -1,6 +1,6 @@
 # BatiBot + Parent Looping
 
-Original forked from 
+Original repo and bot forked from PongPagong-dev. This forked simply extend the ability of the bot do parent looping on 4 trainee (Agnes Digital, Inari One, Oguri Cap, and El Condor Pasa)
 
 BatiBot loops Uma Musume **Independent Training** careers automatically on MuMu
 Player. The game plays each 50-minute career by itself; this bot just
