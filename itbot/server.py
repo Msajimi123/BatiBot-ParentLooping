@@ -397,7 +397,7 @@ async function saveClicked(){
  setTimeout(()=>{ b.textContent=old; b.style.color=''; b.style.borderColor=''; },1500);
 }
 async function mainAction(){
- if(running){ await fetch('/api/stop',{method:'POST'}); }
+ if(running){ if(!confirm('Stop the bot?')) return; await fetch('/api/stop',{method:'POST'}); }
  else{ if(await save()===false) return; await fetch('/api/start',{method:'POST'}); }
  setTimeout(refresh,600);
 }
@@ -406,7 +406,7 @@ loadSkills().then(loadSettings); refresh(); loadHistory(); setInterval(loadHisto
 </body></html>"""
 
 
-def make_app(get_bot, start_bot, stop_bot, settings, save_settings, logbuf):
+def make_app(get_bot, start_bot, stop_bot, settings, save_settings, logbuf, log=None):
     app = Flask("uma-it-bot")
 
     @app.get("/")
@@ -527,13 +527,26 @@ def make_app(get_bot, start_bot, stop_bot, settings, save_settings, logbuf):
         save_settings()
         return jsonify({"ok": True})
 
+    def _req_source():
+        # v1.14: 12/09 - Start at 04:06 and Stop at 01:08 that neither Bon
+        # nor his partner sent. Name the sender so it can never be a
+        # mystery again: a browser UA means a UI window clicked, anything
+        # else is another program on the PC poking the port.
+        ua = (request.headers.get("User-Agent") or "?")[:70]
+        port = request.environ.get("REMOTE_PORT", "?")
+        return f"{request.remote_addr}:{port} agent='{ua}'"
+
     @app.post("/api/start")
     def start():
+        if log:
+            log(f"[UI] START requested by {_req_source()}")
         ok = start_bot()
         return jsonify({"ok": ok})
 
     @app.post("/api/stop")
     def stop():
+        if log:
+            log(f"[UI] STOP requested by {_req_source()}")
         stop_bot()
         return jsonify({"ok": True})
 
