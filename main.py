@@ -110,5 +110,5 @@ if __name__ == "__main__":
     log("BatiBot - open http://127.0.0.1:8099 in your browser")
     import threading
     threading.Timer(1.5, open_ui).start()
-    app = make_app(get_bot, start_bot, stop_bot, settings, save_settings, logbuf)
+    app = make_app(get_bot, start_bot, stop_bot, settings, save_settings, logbuf, log)
     app.run(host="127.0.0.1", port=8099)
